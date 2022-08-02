@@ -39,15 +39,21 @@ def unwrap_pagination(data, output_schema):
             if data.get("total") == 0:
                 return data
 
-            marshaled_data = {"total": data["total"]}
-            marshaled_data["items"] = output_schema.dump(data["items"], many=True).data
+            marshaled_data = {
+                "total": data["total"],
+                "items": output_schema.dump(data["items"], many=True).data,
+            }
+
             return marshaled_data
 
         return output_schema.dump(data).data
 
     elif isinstance(data, list):
-        marshaled_data = {"total": len(data)}
-        marshaled_data["items"] = output_schema.dump(data, many=True).data
+        marshaled_data = {
+            "total": len(data),
+            "items": output_schema.dump(data, many=True).data,
+        }
+
         return marshaled_data
 
     return output_schema.dump(data).data
@@ -58,11 +64,7 @@ def validate_schema(input_schema, output_schema):
         @wraps(f)
         def decorated_function(*args, **kwargs):
             if input_schema:
-                if request.get_json():
-                    request_data = request.get_json()
-                else:
-                    request_data = request.args
-
+                request_data = request.get_json() or request.args
                 data, errors = input_schema.load(request_data)
 
                 if errors:
@@ -80,10 +82,11 @@ def validate_schema(input_schema, output_schema):
             if isinstance(resp, tuple):
                 return resp[0], resp[1]
 
-            if not resp:
-                return dict(message="No data found"), 404
-
-            return unwrap_pagination(resp, output_schema), 200
+            return (
+                (unwrap_pagination(resp, output_schema), 200)
+                if resp
+                else (dict(message="No data found"), 404)
+            )
 
         return decorated_function
 

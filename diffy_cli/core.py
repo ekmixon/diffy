@@ -56,15 +56,13 @@ def add_plugins_args(f):
     """Adds installed plugin options."""
     schemas = []
     if isinstance(f, click.Command):
-        for p in plugins.all():
-            schemas.append(get_plugin_properties(p.json_schema))
+        schemas.extend(get_plugin_properties(p.json_schema) for p in plugins.all())
         f.params.extend(params_factory(schemas))
     else:
         if not hasattr(f, "__click_params__"):
             f.__click_params__ = []
 
-        for p in plugins.all():
-            schemas.append(get_plugin_properties(p.json_schema))
+        schemas.extend(get_plugin_properties(p.json_schema) for p in plugins.all())
         f.__click_params__.extend(params_factory(schemas))
     return f
 
@@ -124,9 +122,11 @@ def plugins_group():
 @plugins_group.command("list")
 def list_plugins():
     """Shows all available plugins"""
-    table = []
-    for p in plugins.all():
-        table.append([p.title, p.slug, p.version, p.author, p.description])
+    table = [
+        [p.title, p.slug, p.version, p.author, p.description]
+        for p in plugins.all()
+    ]
+
     click.echo(
         tabulate(table, headers=["Title", "Slug", "Version", "Author", "Description"])
     )

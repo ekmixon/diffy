@@ -35,8 +35,7 @@ def valid_account(identifier):
     :param identifier: identifier to validate
     :return: bool. ``True``
     """
-    account = get_account_id(identifier)
-    if account:
+    if account := get_account_id(identifier):
         return True
 
 
@@ -46,14 +45,12 @@ def get_account_name(identifier):
     :param identifier: identifier to fetch
     """
     log.debug(f"Fetching account information. Name: {identifier}")
-    account_data = swag.get(f"[?id=='{identifier}']")
-
-    if not account_data:
+    if account_data := swag.get(f"[?id=='{identifier}']"):
+        return account_data["name"]
+    else:
         raise ResolveException(
             f"Unable to find any account information. Identifier: {identifier}"
         )
-
-    return account_data["name"]
 
 
 def get_account_id(identifier):

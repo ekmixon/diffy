@@ -32,8 +32,7 @@ def encode_command(string: str) -> str:
     :returns: String. Command(s) prepared for execution.
     """
     encoded = urlsafe_b64encode(string.encode("utf-8"))
-    command = f"eval $(echo {encoded} | base64 --decode)"
-    return command
+    return f"eval $(echo {encoded} | base64 --decode)"
 
 
 @sts_client("ssm")
@@ -91,10 +90,10 @@ def retry_throttled(exception) -> bool:
     :param exception:
     :return:
     """
-    if isinstance(exception, ClientError):
-        if exception.response["Error"]["Code"] != "InvocationDoesNotExist":
-            return True
-    return False
+    return (
+        isinstance(exception, ClientError)
+        and exception.response["Error"]["Code"] != "InvocationDoesNotExist"
+    )
 
 
 @sts_client("ssm")
@@ -116,9 +115,7 @@ def get_command_invocation(command_id: str, instance_id: str, **kwargs) -> dict:
 
 def is_completed(status: str) -> bool:
     """Determines if the status is deemed to be completed."""
-    if status in ["Success", "TimedOut", "Cancelled", "Failed"]:
-        return True
-    return False
+    return status in {"Success", "TimedOut", "Cancelled", "Failed"}
 
 
 def retry_pending(exception) -> bool:

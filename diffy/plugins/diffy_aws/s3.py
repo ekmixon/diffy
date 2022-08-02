@@ -64,6 +64,4 @@ def save_file(key: str, item: str, dry_run=None, **kwargs) -> dict:
     bucket = CONFIG.get("DIFFY_AWS_PERSISTENCE_BUCKET")
     logger.debug(f"Writing item to s3. Bucket: {bucket} Key: {key}")
 
-    if not dry_run:
-        return _put_to_s3(kwargs["client"], bucket, key, item)
-    return {}
+    return {} if dry_run else _put_to_s3(kwargs["client"], bucket, key, item)

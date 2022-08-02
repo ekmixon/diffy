@@ -24,10 +24,10 @@ def retry_throttled(exception):
     :return:
     """
     logger.debug(exception)
-    if isinstance(exception, ClientError):
-        if exception.response["Error"]["Code"] == "ThrottlingException":
-            return True
-    return False
+    return (
+        isinstance(exception, ClientError)
+        and exception.response["Error"]["Code"] == "ThrottlingException"
+    )
 
 
 @sts_client("autoscaling")

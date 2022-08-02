@@ -29,15 +29,13 @@ def configure_swag() -> None:
     if CONFIG["DIFFY_SWAG_ENABLED"]:
         swag_config = CONFIG.get_namespace("SWAG_")
         logger.debug(str(swag_config))
-        swag_config = {"swag." + k: v for k, v in swag_config.items()}
+        swag_config = {f"swag.{k}": v for k, v in swag_config.items()}
         swag.configure(**parse_swag_config_options(swag_config))
         CONFIG["DIFFY_ACCOUNTS"] = swag.get_service_enabled("diffy")
 
 
 def valid_region(region) -> bool:
-    if region in CONFIG["DIFFY_REGIONS"]:
-        return True
-    return False
+    return region in CONFIG["DIFFY_REGIONS"]
 
 
 def consume_envvars(defaults: dict) -> dict:
@@ -177,10 +175,7 @@ class Config(dict):
         for k, v in self.items():
             if not k.startswith(namespace):
                 continue
-            if trim_namespace:
-                key = k[len(namespace) :]
-            else:
-                key = k
+            key = k[len(namespace) :] if trim_namespace else k
             if lowercase:
                 key = key.lower()
             rv[key] = v

@@ -42,12 +42,9 @@ def json_schema_to_click_type(schema: dict) -> tuple:
     :return: Tuple of :class:`click.ParamType`, `description`` of option and optionally a :class:`click.Choice`
      if the allowed values are a closed list (JSON schema ``enum``)
     """
-    choices = None
-    if isinstance(schema["type"], list):
-        if "string" in schema["type"]:
-            schema["type"] = "string"
+    if isinstance(schema["type"], list) and "string" in schema["type"]:
+        schema["type"] = "string"
     click_type = SCHEMA_BASE_MAP[schema["type"]]
     description = schema.get("title")
-    if schema.get("enum"):
-        choices = click.Choice(schema["enum"])
+    choices = click.Choice(schema["enum"]) if schema.get("enum") else None
     return click_type, description, choices

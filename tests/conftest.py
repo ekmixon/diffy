@@ -22,7 +22,7 @@ def app(request):
     Creates a new Flask application for a test duration.
     Uses application factory `create_app`.
     """
-    _app = create_app(os.path.dirname(os.path.realpath(__file__)) + "/config.yml")
+    _app = create_app(f"{os.path.dirname(os.path.realpath(__file__))}/config.yml")
     ctx = _app.app_context()
     ctx.push()
 

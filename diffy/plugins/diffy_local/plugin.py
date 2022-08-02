@@ -26,11 +26,7 @@ logger = logging.getLogger(__name__)
 
 def get_local_file_path(file_type: str, key: str) -> str:
     """Creates the full path for given local file."""
-    if file_type:
-        file_name = f"{file_type}-{key}.json"
-    else:
-        file_name = f"{key}.json"
-
+    file_name = f"{file_type}-{key}.json" if file_type else f"{key}.json"
     return os.path.join(CONFIG.get("DIFFY_LOCAL_FILE_DIRECTORY"), file_name)
 
 

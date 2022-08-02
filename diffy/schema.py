@@ -22,33 +22,28 @@ class DiffySchema(Schema):
     __envelope__ = True
 
     def under(self, data, many=None):
-        items = []
         if many:
-            for i in data:
-                items.append({underscore(key): value for key, value in i.items()})
-            return items
+            return [{underscore(key): value for key, value in i.items()} for i in data]
         return {underscore(key): value for key, value in data.items()}
 
     def camel(self, data, many=None):
-        items = []
         if many:
-            for i in data:
-                items.append(
-                    {
-                        camelize(key, uppercase_first_letter=False): value
-                        for key, value in i.items()
-                    }
-                )
-            return items
+            return [
+                {
+                    camelize(key, uppercase_first_letter=False): value
+                    for key, value in i.items()
+                }
+                for i in data
+            ]
+
         return {
             camelize(key, uppercase_first_letter=False): value
             for key, value in data.items()
         }
 
     def wrap_with_envelope(self, data, many):
-        if many:
-            if "total" in self.context.keys():
-                return dict(total=self.context["total"], items=data)
+        if many and "total" in self.context.keys():
+            return dict(total=self.context["total"], items=data)
         return data
 
 
@@ -81,20 +76,15 @@ class DiffyOutputSchema(DiffySchema):
     def post_process(self, data, many):
         if data:
             data = self.camel(data, many=many)
-        if self.__envelope__:
-            return self.wrap_with_envelope(data, many=many)
-        else:
-            return data
+        return self.wrap_with_envelope(data, many=many) if self.__envelope__ else data
 
 
 def resolve_plugin_slug(slug):
     """Attempts to resolve plugin to slug."""
-    plugin = plugins.get(slug)
-
-    if not plugin:
+    if plugin := plugins.get(slug):
+        return plugin
+    else:
         raise ValidationError(f"Could not find plugin. Slug: {slug}")
-
-    return plugin
 
 
 class PluginOptionSchema(Schema):

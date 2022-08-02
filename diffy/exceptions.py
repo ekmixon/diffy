@@ -91,10 +91,7 @@ class TargetNotFound(DiffyException):
     """
 
     def __init__(self, target_key, plugin_slug, *args, **kwargs):
-        options = ""
-        for k, v in kwargs.items():
-            options += f"{k}: {v} "
-
+        options = "".join(f"{k}: {v} " for k, v in kwargs.items())
         kwargs[
             "message"
         ] = f"Could not find target. key: {target_key} slug: {plugin_slug} {options}"

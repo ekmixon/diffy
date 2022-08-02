@@ -37,10 +37,9 @@ def create_app(app_name=None, blueprints=None, config=None):
     :param blueprints:
     :return:
     """
-    if not blueprints:
-        blueprints = DEFAULT_BLUEPRINTS
-    else:
-        blueprints = blueprints + DEFAULT_BLUEPRINTS
+    blueprints = (
+        blueprints + DEFAULT_BLUEPRINTS if blueprints else DEFAULT_BLUEPRINTS
+    )
 
     if not app_name:
         app_name = __name__
